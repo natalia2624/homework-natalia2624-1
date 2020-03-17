@@ -27,11 +27,12 @@ def poland_cases_by_date(day: int, month: int, year: int = 2020) -> int:
     :param month: Month to get the cases for as an integer indexed from 1
     :return: Number of cases on a given date as an integer
     """
-    
-    # Your code goes here (remove pass)
-    pass
+    year=year-2000
+    result = confirmed_cases.loc[confirmed_cases["Country/Region"]=="Poland"][f"{month}/{day}/{year}"].values[0]
+    return result
 
-
+  
+import datetime
 def top5_countries_by_date(day: int, month: int, year: int = 2020) -> List[str]:
     """
     Returns the top 5 infected countries given a date (confirmed cases).
@@ -47,11 +48,13 @@ def top5_countries_by_date(day: int, month: int, year: int = 2020) -> List[str]:
     :param year: Month to get the countries for as an integer indexed from 1
     :return: A list of strings with the names of the coutires
     """
+    data = datetime.date(year,month,day)
+    data = data.strftime('%m/%d/%y').lstrip("0").replace(" 0", " ")
+    result = confirmed_cases.groupby(["Country/Region"])[[data]].max().sort_values(by=data,ascending=False).head(5)
+    wynik = result.index.tolist()
+    return wynik
 
-    # Your code goes here (remove pass)
-    pass
-
-
+import datetime
 def no_new_cases_count(day: int, month: int, year: int = 2020) -> int:
     """
     Returns the number of countries/regions where the infection count in a given day was the same as the previous day.
@@ -68,5 +71,9 @@ def no_new_cases_count(day: int, month: int, year: int = 2020) -> int:
     :return: Number of countries/regions where the count has not changed in a day
     """
     
-    # Your code goes here (remove pass)
-    pass
+    data = datetime.date(year,month,day)
+    data_str = data.strftime('%m/%d/%y').lstrip("0").replace(" 0", " ").replace("/0", "/")
+    wczoraj = data - datetime.timedelta(days=1)
+    wczoraj_str = wczoraj.strftime('%m/%d/%y').lstrip("0").replace(" 0", " ").replace("/0", "/")
+    result = confirmed_cases.loc[confirmed_cases[data_str] != confirmed_cases[wczoraj_str]]
+    return result.shape[0]
